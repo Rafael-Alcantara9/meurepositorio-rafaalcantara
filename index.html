@@ -182,7 +182,221 @@
       </section>
     </div>
 
+    <!-- ============================================================
+         CONTROLE MENSAL DE CONTAS
+         ============================================================ -->
+    <section class="contas-section" aria-label="Controle mensal de contas">
+
+      <div class="contas-section__header">
+        <h2 class="section-title contas-section__title">📅 Controle Mensal de Contas</h2>
+        <button class="btn btn--primary" id="btn-gerar-relatorio" aria-label="Gerar relatório mensal">
+          📊 Gerar Relatório
+        </button>
+      </div>
+
+      <!-- Formulário para nova conta a pagar -->
+      <div class="contas-form-wrapper">
+        <h3 class="contas-form-wrapper__title">➕ Nova Conta a Pagar</h3>
+        <form id="form-conta" novalidate>
+
+          <div class="form-group">
+            <label for="conta-descricao" class="form-label">Descrição <span class="required">*</span></label>
+            <input
+              type="text"
+              id="conta-descricao"
+              name="conta-descricao"
+              class="form-control"
+              placeholder="Ex: Aluguel, Conta de luz..."
+              maxlength="100"
+              required
+            />
+            <span class="form-error" id="erro-conta-descricao"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="conta-valor" class="form-label">Valor (R$) <span class="required">*</span></label>
+              <input
+                type="number"
+                id="conta-valor"
+                name="conta-valor"
+                class="form-control"
+                placeholder="0,00"
+                min="0.01"
+                step="0.01"
+                required
+              />
+              <span class="form-error" id="erro-conta-valor"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="conta-vencimento" class="form-label">Vencimento <span class="required">*</span></label>
+              <input
+                type="date"
+                id="conta-vencimento"
+                name="conta-vencimento"
+                class="form-control"
+                required
+              />
+              <span class="form-error" id="erro-conta-vencimento"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="conta-categoria" class="form-label">Categoria <span class="required">*</span></label>
+            <select id="conta-categoria" name="conta-categoria" class="form-control" required>
+              <option value="">Selecione uma categoria...</option>
+              <option value="Moradia">🏠 Moradia</option>
+              <option value="Alimentação">🍽️ Alimentação</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Saúde">💊 Saúde</option>
+              <option value="Educação">📚 Educação</option>
+              <option value="Lazer">🎮 Lazer</option>
+              <option value="Contas (água, luz, internet)">💡 Contas (água, luz, internet)</option>
+              <option value="Outros">📌 Outros</option>
+            </select>
+            <span class="form-error" id="erro-conta-categoria"></span>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full">
+            ➕ Adicionar Conta
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Navegação por mês/ano -->
+      <div class="mes-nav" aria-label="Navegação por mês">
+        <button class="btn btn--secondary mes-nav__btn" id="btn-mes-anterior" aria-label="Mês anterior">◀</button>
+        <span class="mes-nav__label" id="mes-atual-label" aria-live="polite"></span>
+        <button class="btn btn--secondary mes-nav__btn" id="btn-mes-proximo" aria-label="Próximo mês">▶</button>
+      </div>
+
+      <!-- Abas: Em Aberto / Pagas -->
+      <div class="tabs" role="tablist" aria-label="Status das contas">
+        <button
+          class="tab tab--active"
+          id="tab-aberto"
+          role="tab"
+          aria-selected="true"
+          aria-controls="painel-aberto"
+        >📋 Em Aberto <span class="tab__count" id="count-aberto">(0)</span></button>
+        <button
+          class="tab"
+          id="tab-pagas"
+          role="tab"
+          aria-selected="false"
+          aria-controls="painel-pagas"
+        >✅ Pagas <span class="tab__count" id="count-pagas">(0)</span></button>
+      </div>
+
+      <!-- Painel: Em Aberto -->
+      <div id="painel-aberto" role="tabpanel" aria-labelledby="tab-aberto">
+        <div id="lista-contas-aberto" class="contas-lista"></div>
+        <div id="vazio-contas-aberto" class="empty-state" aria-live="polite">
+          <span class="empty-state__icon">🎉</span>
+          <p>Nenhuma conta em aberto neste mês!</p>
+        </div>
+      </div>
+
+      <!-- Painel: Pagas -->
+      <div id="painel-pagas" role="tabpanel" aria-labelledby="tab-pagas" hidden>
+        <div id="lista-contas-pagas" class="contas-lista"></div>
+        <div id="vazio-contas-pagas" class="empty-state" aria-live="polite">
+          <span class="empty-state__icon">📭</span>
+          <p>Nenhuma conta paga neste mês.</p>
+        </div>
+      </div>
+
+    </section>
+
   </main>
+
+  <!-- Modal de Relatório Mensal -->
+  <div
+    id="modal-relatorio"
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-relatorio-titulo"
+    tabindex="-1"
+    hidden
+  >
+    <div class="modal__backdrop" id="modal-backdrop"></div>
+    <div class="modal__content">
+
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-relatorio-titulo">
+          📊 Relatório — <span id="relatorio-titulo"></span>
+        </h2>
+        <button class="modal__close" id="btn-fechar-relatorio" aria-label="Fechar relatório">✕</button>
+      </div>
+
+      <div class="modal__body" id="modal-corpo-relatorio">
+
+        <!-- Métricas principais -->
+        <div class="relatorio-cards">
+          <div class="relatorio-card">
+            <span class="relatorio-card__label">Total de Contas</span>
+            <span class="relatorio-card__value" id="relatorio-total-contas">0</span>
+          </div>
+          <div class="relatorio-card relatorio-card--pago">
+            <span class="relatorio-card__label">Total Pago</span>
+            <span class="relatorio-card__value" id="relatorio-total-pago">R$ 0,00</span>
+          </div>
+          <div class="relatorio-card relatorio-card--pendente">
+            <span class="relatorio-card__label">Total Pendente</span>
+            <span class="relatorio-card__value" id="relatorio-total-pendente">R$ 0,00</span>
+          </div>
+          <div class="relatorio-card relatorio-card--vencido">
+            <span class="relatorio-card__label">Total Vencido</span>
+            <span class="relatorio-card__value" id="relatorio-total-vencido">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- Barra de progresso -->
+        <div class="relatorio-progresso">
+          <div class="relatorio-progresso__header">
+            <span class="relatorio-progresso__label">Percentual de Quitação</span>
+            <span class="relatorio-progresso__pct" id="relatorio-percentual">0%</span>
+          </div>
+          <div class="relatorio-progresso__barra-fundo" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="relatorio-barra-container">
+            <div class="relatorio-progresso__barra" id="relatorio-barra" style="width:0%"></div>
+          </div>
+          <span class="relatorio-progresso__desc" id="relatorio-barra-label" aria-live="polite">0% quitado</span>
+        </div>
+
+        <!-- Breakdown por categoria -->
+        <div class="relatorio-breakdown">
+          <h3 class="relatorio-breakdown__titulo">📂 Por Categoria</h3>
+          <div class="relatorio-tabela-wrapper">
+            <table class="relatorio-tabela" aria-label="Resumo por categoria">
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Previsto</th>
+                  <th>Pago</th>
+                  <th>Pendente</th>
+                </tr>
+              </thead>
+              <tbody id="relatorio-breakdown"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" id="btn-imprimir-relatorio" aria-label="Imprimir relatório">
+          🖨️ Imprimir / Exportar
+        </button>
+        <button class="btn btn--primary" id="btn-fechar-relatorio-rodape" aria-label="Fechar relatório">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <footer class="footer">
     <div class="container">
