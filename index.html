@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💰 Controle Financeiro Pessoal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Cabeçalho -->
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <span class="header__icon">💰</span>
+        <h1 class="header__title">Controle Financeiro</h1>
+      </div>
+      <p class="header__subtitle">Gerencie suas finanças pessoais</p>
+    </div>
+  </header>
+
+  <main class="main container">
+
+    <!-- Cards de Resumo -->
+    <section class="summary" aria-label="Resumo financeiro">
+      <div class="card card--balance">
+        <div class="card__icon">💳</div>
+        <div class="card__content">
+          <span class="card__label">Saldo Atual</span>
+          <span class="card__value" id="saldo">R$ 0,00</span>
+        </div>
+      </div>
+      <div class="card card--income">
+        <div class="card__icon">📈</div>
+        <div class="card__content">
+          <span class="card__label">Total de Receitas</span>
+          <span class="card__value" id="receitas">R$ 0,00</span>
+        </div>
+      </div>
+      <div class="card card--expense">
+        <div class="card__icon">📉</div>
+        <div class="card__content">
+          <span class="card__label">Total de Despesas</span>
+          <span class="card__value" id="despesas">R$ 0,00</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-grid">
+
+      <!-- Formulário de Nova Transação -->
+      <section class="form-section" aria-label="Adicionar transação">
+        <h2 class="section-title">➕ Nova Transação</h2>
+        <form id="form-transacao" novalidate>
+
+          <div class="form-group">
+            <label for="descricao" class="form-label">Descrição <span class="required">*</span></label>
+            <input
+              type="text"
+              id="descricao"
+              name="descricao"
+              class="form-control"
+              placeholder="Ex: Salário mensal"
+              maxlength="100"
+              required
+            />
+            <span class="form-error" id="erro-descricao"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="valor" class="form-label">Valor (R$) <span class="required">*</span></label>
+              <input
+                type="number"
+                id="valor"
+                name="valor"
+                class="form-control"
+                placeholder="0,00"
+                min="0.01"
+                step="0.01"
+                required
+              />
+              <span class="form-error" id="erro-valor"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="data" class="form-label">Data <span class="required">*</span></label>
+              <input
+                type="date"
+                id="data"
+                name="data"
+                class="form-control"
+                required
+              />
+              <span class="form-error" id="erro-data"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-option radio-option--income">
+                <input type="radio" name="tipo" value="receita" id="tipo-receita" />
+                <span class="radio-custom"></span>
+                <span class="radio-label">📈 Receita</span>
+              </label>
+              <label class="radio-option radio-option--expense">
+                <input type="radio" name="tipo" value="despesa" id="tipo-despesa" />
+                <span class="radio-custom"></span>
+                <span class="radio-label">📉 Despesa</span>
+              </label>
+            </div>
+            <span class="form-error" id="erro-tipo"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="categoria" class="form-label">Categoria <span class="required">*</span></label>
+            <select id="categoria" name="categoria" class="form-control" required>
+              <option value="">Selecione o tipo primeiro...</option>
+            </select>
+            <span class="form-error" id="erro-categoria"></span>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full">
+            ✅ Adicionar Transação
+          </button>
+
+        </form>
+      </section>
+
+      <!-- Lista de Transações -->
+      <section class="list-section" aria-label="Lista de transações">
+
+        <!-- Filtros -->
+        <div class="filters">
+          <h2 class="section-title">🔍 Filtros</h2>
+          <div class="filters__grid">
+            <div class="form-group">
+              <label for="filtro-tipo" class="form-label">Tipo</label>
+              <select id="filtro-tipo" class="form-control">
+                <option value="todos">Todos</option>
+                <option value="receita">Receitas</option>
+                <option value="despesa">Despesas</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="filtro-categoria" class="form-label">Categoria</label>
+              <select id="filtro-categoria" class="form-control">
+                <option value="todas">Todas</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="filtro-data-inicio" class="form-label">Data Inicial</label>
+              <input type="date" id="filtro-data-inicio" class="form-control" />
+            </div>
+
+            <div class="form-group">
+              <label for="filtro-data-fim" class="form-label">Data Final</label>
+              <input type="date" id="filtro-data-fim" class="form-control" />
+            </div>
+          </div>
+          <button id="btn-limpar-filtros" class="btn btn--secondary">🧹 Limpar Filtros</button>
+        </div>
+
+        <!-- Transações -->
+        <h2 class="section-title" style="margin-top: 1.5rem;">📋 Transações</h2>
+        <div id="lista-transacoes">
+          <!-- Itens gerados pelo JS -->
+        </div>
+
+        <div id="estado-vazio" class="empty-state" aria-live="polite">
+          <span class="empty-state__icon">📭</span>
+          <p>Nenhuma transação encontrada.</p>
+          <p>Adicione sua primeira transação!</p>
+        </div>
+
+      </section>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>💰 Controle Financeiro Pessoal — Todos os dados ficam salvos no seu navegador.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
